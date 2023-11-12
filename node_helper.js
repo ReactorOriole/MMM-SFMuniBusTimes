@@ -1,23 +1,29 @@
 const NodeHelper = require("node_helper");
 const fetch = require("node-fetch");
-const { parseString } = require("xml2js");
-const { promisify } = require("util");
+const { parseStringPromise } = require("xml2js");
 const { URL } = require("url");
-
-const parseXML = promisify(parseString);
 
 module.exports = NodeHelper.create({
   start: function() {
     console.log(this.name + " has started!");
   },
 
-  url: new URL("https://retro.umoiq.com/service/service/publicXMLFeed"),
+  url: new URL("https://retro.umoiq.com/service/publicXMLFeed"),
 
   // Fetch train times and generate a clean object only containing the require data
   loadTimes: async function() {
-    const data = await fetch(this.url).then(res => res.text()).catch(e => console.error(e));
+    let parsedXML;
+    try {
+      const response = await fetch(this.url);
+      const result = await response.text();
+      parsedXML = await parseStringPromise(result);
+    } catch(err) {
+      console.error(err);
+      return;
+    }
 
-    const obj = await parseXML(data);
+    const obj = parsedXML;
+
     if (obj.body.Error !== undefined) {
       console.log(obj.body.Error[0]._); // Print out error
       return;
@@ -28,7 +34,7 @@ module.exports = NodeHelper.create({
 
     // Digest data from each stop's predictions
     for (const pred of predictions) {
-      const route = pred.$.routeTag;
+      let route = pred.$.routeTag;
       if (pred.direction) {
         route = route + '-' + pred.direction[0].$.title;
       }
