@@ -48,7 +48,9 @@ Module.register("MMM-SFMuniBusTimes", {
 
       // Loop through each route for the current stop
       for (const routeObj of stop.routes) {
-        const { route } = routeObj;
+        const { route, trains } = routeObj;
+
+        if (trains && trains.length < 1) continue;
 
         // Create a row that will hold the route and next 3 bus / train times
         const row = document.createElement("tr");
@@ -62,7 +64,7 @@ Module.register("MMM-SFMuniBusTimes", {
 
         let first = true;
         // Loop through each train for the current route
-        for (const train of routeObj.trains) {
+        for (const train of trains) {
           const trainCell = document.createElement("td");
           // Calculate the minutes remaining for the train / bus to arrive
           const mins = Math.floor(train.seconds / 60);
