@@ -48,7 +48,7 @@ module.exports = NodeHelper.create({
         // TODO: Prevent message repetition in resulting object
         // Sanitize message objects and add them to stop data
         for (const msg of pred.message) {
-          const message = msg.$;
+          const message = msg.$.text;
           stopData.messages.push(message);
         }
       }
@@ -62,7 +62,6 @@ module.exports = NodeHelper.create({
           count += 1;
           const train = {
             seconds: trainPred.$.seconds,
-            cars: trainPred.$.vehiclesInConsist,
             delayed: trainPred.$.delayed === true, // Defaults to false if delayed property doesn't exist
             direction: pred.direction[0].$.title,
           };
@@ -126,7 +125,7 @@ module.exports = NodeHelper.create({
 
     // Set url params based on config
     this.url.searchParams.append("command", "predictionsForMultiStops");
-    this.url.searchParams.append("a", "sf-muni");
+    this.url.searchParams.append("a", "sfmuni-sandbox");
     for (let param of params) {
       this.url.searchParams.append("stops", param);
     }
